@@ -19,7 +19,7 @@ export function Sendmoney() {
     async function fetchReceiverDetails() {
 
         const token = localStorage.getItem("token")
-        const response = await axios.get(`${import.meta.env.VITE_URL}api/v1/account/receiverdetails/${rId}`,{
+        const response = await axios.get(`${import.meta.env.VITE_URL}/api/v1/account/receiverdetails/${rId}`,{
             headers: {
                 Authorization: token
             }
