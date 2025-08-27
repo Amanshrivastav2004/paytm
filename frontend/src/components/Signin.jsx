@@ -16,7 +16,7 @@ export function Signin() {
         async function loginHandler() {
 
             try {
-            const response = await axios.post(`${import.meta.env.VITE_URL}/api/v1/user/signin`,{
+            const response = await axios.post(`${import.meta.env.VITE_URL}api/v1/user/signin`,{
                 email,
                 password
             })

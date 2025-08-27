@@ -56,7 +56,7 @@ export function Signup() {
             <button className="rounded-md bg-black text-white w-[90%] p-[5px]" 
             onClick={async () => {
                 try {
-                    const response = await axios.post(`${import.meta.env.VITE_URL}/api/v1/user/signup`,{
+                    const response = await axios.post(`${import.meta.env.VITE_URL}api/v1/user/signup`,{
                         firstname,
                         lastname,
                         email,

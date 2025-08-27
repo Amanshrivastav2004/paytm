@@ -23,7 +23,7 @@ export function Users() {
                 fetchUsers()
             } else {
             const token = localStorage.getItem("token")
-            const response = await axios.get(`${import.meta.env.VITE_URL}/api/v1/user/bulk?filter=${filter}`,{
+            const response = await axios.get(`${import.meta.env.VITE_URL}api/v1/user/bulk?filter=${filter}`,{
                 headers: {
                     Authorization: token
                 }
