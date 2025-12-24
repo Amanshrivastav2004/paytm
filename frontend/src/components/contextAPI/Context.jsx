@@ -23,6 +23,8 @@ export function MyProvider({ children }) {
                 return;
             }
 
+            console.log("Sending request with token:", token ? "Token exists" : "No token");
+
             const response = await axios.get(`${import.meta.env.VITE_URL}/api/v1/account/balance`, {
                 headers: {
                     Authorization: token
@@ -34,6 +36,8 @@ export function MyProvider({ children }) {
             setlastname(response.data.lastname);
         } catch (error) {
             console.error("Error fetching data:", error);
+            console.error("Error response:", error.response?.data);
+            console.error("Error status:", error.response?.status);
         }
     }
 
@@ -47,6 +51,8 @@ export function MyProvider({ children }) {
                 return;
             }
 
+            console.log("Fetching users with token:", token ? "Token exists" : "No token");
+
             const response = await axios.get(`${import.meta.env.VITE_URL}/api/v1/user/bulk`,{
                 headers: {
                     Authorization: token
@@ -55,6 +61,8 @@ export function MyProvider({ children }) {
             setallusers(response.data.allusers)
         } catch (error) {
             console.error("Error fetching users:", error);
+            console.error("Error response:", error.response?.data);
+            console.error("Error status:", error.response?.status);
         }
     }
 
