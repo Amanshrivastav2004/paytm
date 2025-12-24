@@ -1,10 +1,12 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const MyContext = createContext();
 
 export function MyProvider({ children }) {
+    const navigate = useNavigate();
     const [balance, setbalance] = useState(0);
     const [firstname, setfirstname] = useState("");
     const [lastname, setlastname] = useState("");
@@ -13,6 +15,23 @@ export function MyProvider({ children }) {
 
     const [allusers,setallusers] = useState()
 
+    // Helper function to handle token expiration
+    const handleTokenExpiration = (error) => {
+        if (error.response?.status === 403 || error.response?.status === 401) {
+            const errorData = error.response?.data;
+            if (errorData?.errorType === 'TokenExpiredError' || errorData?.error === 'jwt expired') {
+                localStorage.removeItem("token");
+                const currentPath = window.location.pathname;
+                // Only show toast and redirect if not already on auth pages
+                if (currentPath !== "/" && currentPath !== "/signin" && currentPath !== "/signup") {
+                    toast.error("Session expired. Please sign in again.");
+                    navigate("/signin");
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 
     async function fetchData() {
         try {
@@ -38,6 +57,7 @@ export function MyProvider({ children }) {
             console.error("Error fetching data:", error);
             console.error("Error response:", error.response?.data);
             console.error("Error status:", error.response?.status);
+            handleTokenExpiration(error);
         }
     }
 
@@ -63,13 +83,20 @@ export function MyProvider({ children }) {
             console.error("Error fetching users:", error);
             console.error("Error response:", error.response?.data);
             console.error("Error status:", error.response?.status);
+            handleTokenExpiration(error);
         }
     }
 
-    // Fetch data when the component mounts
+    // Fetch data when the component mounts - only if token exists and not on auth pages
     useEffect(() => {
-        fetchData();
-        fetchUsers();
+        const token = localStorage.getItem("token");
+        const currentPath = window.location.pathname;
+        
+        // Only fetch data if user is logged in and not on auth pages
+        if (token && currentPath !== "/" && currentPath !== "/signin" && currentPath !== "/signup") {
+            fetchData();
+            fetchUsers();
+        }
     }, []);
 
     return (
