@@ -1,18 +1,36 @@
 const { jwt, jwtkey } = require("../jwt/jwt")
 
 function validateReq(req,res,next) {
-    const token = req.headers.authorization
+    const authHeader = req.headers.authorization
 
-    if (!token) {
-        return res.json({mssg: "Signup/Signin first"})
+    if (!authHeader) {
+        console.log("No authorization header found")
+        return res.status(401).json({mssg: "Signup/Signin first"})
     }
+    
+    // Extract token - handle both "Bearer <token>" and direct token formats
+    const token = authHeader.startsWith('Bearer ') 
+        ? authHeader.slice(7, authHeader.length)
+        : authHeader
+    
+    if (!token) {
+        console.log("Token extraction failed")
+        return res.status(401).json({mssg: "Token not provided"})
+    }
+
+    if (!jwtkey) {
+        console.error("JWT_KEY environment variable is not set!")
+        return res.status(500).json({mssg: "Server configuration error"})
+    }
+    
     try {
-        const verified = jwt.verify(token,jwtkey) 
+        const verified = jwt.verify(token, jwtkey) 
 
         req.userId = verified.userId
         next()
     } catch (error) {  //throws error if not verified
-        res.status(403).json({mssg: "INVALID TOKEN",error: error.message})
+        console.log("Token verification failed:", error.message)
+        res.status(403).json({mssg: "INVALID TOKEN", error: error.message})
     }
 }
 
