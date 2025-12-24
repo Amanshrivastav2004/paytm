@@ -65,15 +65,17 @@ export function Signup() {
                     const token = response.data.token
                     if (token) {
                         localStorage.setItem("token",response.data.token)
+                        toast.success(response.data.mssg)
                         await fetchData()
                         await fetchUsers()
                         navigate("/dashboard")
-                        toast.success(response.data.mssg)
                     } else {
-                        toast(response.data.mssg)
+                        toast.warning(response.data.mssg || "Signup failed")
                     }
                 } catch (error) {
-                    toast.error(error.response.data.error)
+                    console.error("Signup error:", error)
+                    const errorMessage = error.response?.data?.error || error.response?.data?.mssg || "Signup failed. Please try again."
+                    toast.error(errorMessage)
                 }
             }}>Sign Up</button>
             <p className="font-medium" >Already have an account? <Link to={"/signin"} className="underline" >Login</Link> </p>
