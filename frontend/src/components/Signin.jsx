@@ -64,7 +64,12 @@ export function Signin() {
                 <div className="flex flex-col items-center gap-3 w-full font-medium mt-[5%]">
                 <button className="rounded-md bg-black text-white w-[90%] p-[5px]"
                 onClick={() => {
-                    loginHandler()
+                    try {
+                        loginHandler()
+
+                    } catch (error) {
+                        toast.error(error.response.data.error)
+                    }
                 }} >Sign In</button>
                 <p className="font-medium" >Don't have an account? <Link to={"/"} className="underline">Sign Up</Link> </p>
                 </div>

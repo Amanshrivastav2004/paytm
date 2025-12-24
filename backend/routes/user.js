@@ -11,42 +11,30 @@ const userrouter = express.Router()
 userrouter.post("/signup",validateUser(signupSchema), async(req,res) => {
     const {firstname,lastname,email,password} = req.body
 
+    const hashedPass = await bcrypt.hash(password, 10)
+
     try {
         const result = await User.findOne({email})
         if (result) {
-            return res.status(400).json({mssg : "User with this email already exists"})
-        }
-        
-        const hashedPass = await bcrypt.hash(password, 10)
-        
-        const user = await User.create({
-            firstname,
-            lastname,
-            email,
-            password: hashedPass
-        })
-        const userId = user._id
+            return res.json({mssg : "User with this username already exists"})
+        } else {
+            const user = await User.create({
+                firstname,
+                lastname,
+                email,
+                password: hashedPass})
+            const userId = user._id
 
-        await Account.create({
-            userId: userId,
-            balance: Math.round(1 + Math.random() * 10000)
-        })
-
-        const token = jwt.sign({userId}, jwtkey, { expiresIn: "1h" })
-        return res.status(200).json({mssg: "User created successfully", token: token})
-        
-    } catch (error) {
-        console.error("Signup error:", error)
-        
-        // Check if it's a MongoDB connection error
-        if (error.name === 'MongooseServerSelectionError' || error.message.includes('buffering timed out')) {
-            return res.status(500).json({
-                mssg: "Database connection failed. Please try again later.", 
-                error: "Database connection timeout"
+            await Account.create({
+                userId: userId,
+                balance: Math.round(1 + Math.random() * 10000)
             })
-        }
-        
-        return res.status(500).json({mssg: "Error while creating user", error: error.message})
+
+            const token = jwt.sign({userId},jwtkey,{ expiresIn: "1h" })
+            return res.json({mssg: "User created successfully",token: token})
+        } 
+    } catch (error) {
+        return res.json({mssg: "Error while creating user",error})
     }
 
 })

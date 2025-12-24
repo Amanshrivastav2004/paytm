@@ -17,23 +17,15 @@ export function Sendmoney() {
     console.log
 
     async function fetchReceiverDetails() {
-        try {
-            const token = localStorage.getItem("token")
-            const response = await axios.get(`${import.meta.env.VITE_URL}/api/v1/account/receiverdetails/${rId}`,{
-                headers: {
-                    Authorization: token
-                }
-            })
-            setreceiverName(response.data.name)
-        } catch (error) {
-            if (error.response?.data?.errorType === 'TokenExpiredError') {
-                localStorage.removeItem("token");
-                toast.error("Session expired. Please sign in again.");
-                navigate("/signin");
-            } else {
-                toast.error("Failed to fetch receiver details");
+
+        const token = localStorage.getItem("token")
+        const response = await axios.get(`${import.meta.env.VITE_URL}/api/v1/account/receiverdetails/${rId}`,{
+            headers: {
+                Authorization: token
             }
-        }
+        })
+        setreceiverName(response.data.name)
+
     }
 
     useEffect(() => {
@@ -63,28 +55,18 @@ export function Sendmoney() {
                     </div>
                     <Link className="border-2 border-green-500 rounded bg-green-500 text-white text-sm text-center py-[3px] px-[4px]" 
                     onClick={async () => {
-                        try {
-                            const token = localStorage.getItem("token")
-                            const response = await axios.patch(`${import.meta.env.VITE_URL}/api/v1/account/transfer`,{
-                                rId,
-                                amount
-                            },{
-                                headers: {
-                                    Authorization: token
-                                }
-                            })
-                            toast.success(response.data.mssg)
-                            fetchData()
-                            navigate("/dashboard")
-                        } catch (error) {
-                            if (error.response?.data?.errorType === 'TokenExpiredError') {
-                                localStorage.removeItem("token");
-                                toast.error("Session expired. Please sign in again.");
-                                navigate("/signin");
-                            } else {
-                                toast.error(error.response?.data?.mssg || "Transfer failed");
+                        const token = localStorage.getItem("token")
+                        const response = await axios.patch(`${import.meta.env.VITE_URL}/api/v1/account/transfer`,{
+                            rId,
+                            amount
+                        },{
+                            headers: {
+                                Authorization: token
                             }
-                        }
+                        })
+                        toast.success(response.data.mssg)
+                        fetchData()
+                        navigate("/dashboard")
                     }} >Initiate Transfer</Link>
                 </div>
 
