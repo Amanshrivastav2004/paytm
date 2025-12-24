@@ -1,9 +1,22 @@
 const mongoose = require("mongoose")
 
 require("dotenv").config()
-mongoose.connect(`${process.env.MONGO_URL}`)
-.then(() => {console.log("connected to mongoDB")})
-.catch((error) => {console.error("connection error", error)})
+
+if (!process.env.MONGO_URL) {
+    console.error("FATAL ERROR: MONGO_URL is not defined in environment variables")
+}
+
+mongoose.connect(`${process.env.MONGO_URL}`, {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+})
+.then(() => {
+    console.log("✅ Connected to MongoDB successfully")
+})
+.catch((error) => {
+    console.error("❌ MongoDB connection error:", error.message)
+    console.error("Make sure MONGO_URL is set in Vercel environment variables")
+})
 
 const userSchema = new mongoose.Schema({
     firstname: {type: String, required: true},

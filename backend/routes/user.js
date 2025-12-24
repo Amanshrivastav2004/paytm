@@ -37,6 +37,15 @@ userrouter.post("/signup",validateUser(signupSchema), async(req,res) => {
         
     } catch (error) {
         console.error("Signup error:", error)
+        
+        // Check if it's a MongoDB connection error
+        if (error.name === 'MongooseServerSelectionError' || error.message.includes('buffering timed out')) {
+            return res.status(500).json({
+                mssg: "Database connection failed. Please try again later.", 
+                error: "Database connection timeout"
+            })
+        }
+        
         return res.status(500).json({mssg: "Error while creating user", error: error.message})
     }
 
